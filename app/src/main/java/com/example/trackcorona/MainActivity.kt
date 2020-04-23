@@ -17,13 +17,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.main_menu)
+        setContentView(R.layout.activity_virus_map)
 
-        var mainButton = findViewById<Button>(R.id.mmbutton)
-        mainButton.visibility = View.VISIBLE
-
-        var mainTitle = findViewById<TextView>(R.id.maintitle)
-        mainTitle.visibility = View.VISIBLE
+//        var mainButton = findViewById<Button>(R.id.mmbutton)
+//        mainButton.visibility = View.VISIBLE
+//
+//        var mainTitle = findViewById<TextView>(R.id.maintitle)
+//        mainTitle.visibility = View.VISIBLE
 
 
 //        val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
