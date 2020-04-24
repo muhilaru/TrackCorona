@@ -59,7 +59,7 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
 
             val row = it.split(",")
 
-            if (row.size > 1 && row[0] != "UID") {
+            if (row.size > 1 && row[0] != "UID" && row[9] != "" && row[8].toDouble() != 0.0) {
 
                 val coordinates = LatLng(row[8].toDouble(), row[9].toDouble())
                 var name = row[6]
@@ -86,7 +86,11 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
             if (row.size > 1 && row[2] != "Lat" && row[1] != "US") {
 
                 val coordinates = LatLng(row[2].toDouble(), row[3].toDouble())
-                val locationData = DataPoint(row[1], coordinates, row[95].toDouble())
+                var name = row[1]
+                if (row[0] != "") {
+                    name += " (" + row[0] +")"
+                }
+                val locationData = DataPoint(name, coordinates, row[95].toDouble())
                 mClusterManager.addItem(locationData)
 
             }
