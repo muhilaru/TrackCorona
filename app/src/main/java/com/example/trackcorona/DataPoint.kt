@@ -20,7 +20,7 @@ class DataPoint(var name: String, var location: LatLng, var density: Double): Cl
     }
 
     override fun getSnippet(): String {
-        return name
+        return "Confirmed Cases: " + density.toInt()
     }
 
 

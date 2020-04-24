@@ -62,7 +62,13 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
             if (row.size > 1 && row[0] != "UID") {
 
                 val coordinates = LatLng(row[8].toDouble(), row[9].toDouble())
-                val locationData = DataPoint(row[6], coordinates, row[102].toDouble())
+                var name = row[6]
+
+                if (row[5] != "") {
+                    name += " (" + row[5] + " County)"
+                }
+
+                val locationData = DataPoint(name, coordinates, row[102].toDouble())
 
                 mClusterManager.addItem(locationData)
                 listOfDataPoints.add(locationData.makeWeighted())
