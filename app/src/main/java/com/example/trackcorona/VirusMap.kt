@@ -70,9 +70,26 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
+        val globalData = resources.openRawResource(R.raw.corona_data)
+        val readerGlobal = BufferedReader(InputStreamReader(globalData, Charset.forName("UTF-8")))
+
+        readerGlobal.forEachLine {
+
+            val row = it.split(",")
+
+            if (row.size > 1 && row[2] != "Lat" && row[1] != "US") {
+
+                val coordinates = LatLng(row[2].toDouble(), row[3].toDouble())
+                val locationData = DataPoint(row[1], coordinates, row[95].toDouble())
+                mClusterManager.addItem(locationData)
+
+            }
+
+        }
+
         var mProvider = HeatmapTileProvider.Builder().weightedData(listOfDataPoints).build()
         mProvider.setMaxIntensity(10000.00)
-        mProvider.setRadius(35)
+        mProvider.setRadius(50)
         val mOverlay = mMap.addTileOverlay(TileOverlayOptions().tileProvider(mProvider))
 
     }
