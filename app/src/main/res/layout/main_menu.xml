@@ -14,14 +14,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:speed="1dp"
-        app:src="@drawable/rona2" />
+        app:src="@drawable/corona_image" />
 
     <com.q42.android.scrollingimageview.ScrollingImageView
         android:id="@+id/scrolling_foreground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:speed="2.5dp"
-        app:src="@drawable/rona2" />
+        app:src="@drawable/corona_image" />
 
     <RelativeLayout
         android:layout_width="match_parent"

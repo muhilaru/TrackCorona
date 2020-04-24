@@ -1,5 +1,6 @@
 package com.example.trackcorona
 
+import android.content.Intent
 import android.os.Bundle
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -17,7 +18,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_virus_map)
+        println("TEST")
+        setContentView(R.layout.main_menu)
+
+        val loadMap = Intent(this, VirusMap::class.java)
+
+        startActivity(loadMap)
 
 //        var mainButton = findViewById<Button>(R.id.mmbutton)
 //        mainButton.visibility = View.VISIBLE
