@@ -20,21 +20,31 @@ import android.os.StrictMode
 import androidx.core.app.ComponentActivity.ExtraData
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.google.android.gms.maps.model.LatLng
+import com.jjoe64.graphview.helper.GraphViewXML
 
 
 class MainActivity : AppCompatActivity() {
 
+    private var piechart_map = HashMap<Int, String>()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        println("TEST")
-        setContentView(R.layout.main_menu)
+        setContentView(R.layout.data_viz)
+
+
 
         val loadMap = Intent(this, VirusMap::class.java)
 
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
-
+//        loadChart()
+//
         startActivity(loadMap)
 
 
@@ -58,11 +68,71 @@ class MainActivity : AppCompatActivity() {
 //        }
     }
 
-    fun loadHeatMap() {
-//         var mProvider = new HeatmapTileProvider.Builder();
+    fun loadChart() {
+
+        var url =
+            "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
+        var reader = URL(url).openStream().bufferedReader(Charsets.UTF_8)
+
+        var line = ""
+        while (line != null) {
+            line = reader.readLine()
+            if (line == null) {
+                break
+            }
+            val row = line.split(",")
+
+            if (row[1] == "\"Korea") {
+                piechart_map.put(row[row.size - 1].toInt(), "South Korea")
+            } else if (row[0] == "\"Bonaire") {
+                piechart_map.put(
+                    row[row.size - 1].toInt(),
+                    "Netherlands (Bonaire, Sint Eustatius, and Saba"
+                )
+            } else {
+                if (row.size > 1 && row[2] != "Lat" && row[2].toDouble() != 0.0) {
+                    val coordinates = LatLng(row[2].toDouble(), row[3].toDouble())
+                    var name = row[1]
+                    if (row[0].isNotBlank()) {
+                        name += " (" + row[0] + ")"
+                    }
+                    piechart_map.put(row[row.size - 1].toInt(), name)
+
+                }
+            }
+        }
+
+        val sorted = piechart_map.toSortedMap(reverseOrder())
+        var counter = 0
+
+        var pieEntries = ArrayList<PieEntry>()
+
+        for ((key, value) in sorted) {
+            //println(value + " " + key)
+
+            if (counter == 10) {
+                break
+            } else {
+                pieEntries.add(PieEntry(key.toFloat(), value))
+            }
+
+            counter++;
+        }
+
+        var setData = PieDataSet(pieEntries, "Top 10 Countries")
+        var data = PieData(setData)
+
+
+
+        var chart = findViewById<PieChart>(R.id.piechart)
+//        chart.data = data
+//        chart.invalidate()
+
+
+
+
 
     }
-
 
 
 }
