@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 
 
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -13,9 +12,14 @@ import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.algo.NonHierarchicalDistanceBasedAlgorithm
 import com.google.maps.android.heatmaps.HeatmapTileProvider
 import com.google.maps.android.heatmaps.WeightedLatLng
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import java.net.URL
 import java.nio.charset.Charset
+import java.io.*
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import kotlin.text.Charsets.UTF_8
+
 
 class VirusMap : AppCompatActivity(), OnMapReadyCallback {
 
@@ -75,32 +79,69 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
 
             }
         }
+        val url =
+            "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
+        var iterate = URL(url).openStream().bufferedReader(UTF_8)
 
-        val globalData = resources.openRawResource(R.raw.corona_data)
-        val readerGlobal = BufferedReader(InputStreamReader(globalData, Charset.forName("UTF-8")))
-
-        readerGlobal.forEachLine {
-
-            val row = it.split(",")
-
-            if (row.size > 1 && row[2] != "Lat" && row[1] != "US") {
-
-                val coordinates = LatLng(row[2].toDouble(), row[3].toDouble())
-                var name = row[1]
-                if (row[0] != "") {
-                    name += " (" + row[0] +")"
-                }
-                val locationData = DataPoint(name, coordinates, row[95].toDouble())
-                mClusterManager.addItem(locationData)
-
+        var line: String? = ""
+        while (line != null) {
+            line = iterate.readLine()
+            if (line == null) {
+                break
             }
+            val row = line.split(",")
 
+            var csv_error = 0
+            if (row[1] == "\"Korea") {
+                val coordinates = LatLng(row[3].toDouble(), row[4].toDouble())
+                var name = "South Korea"
+                val locationData = DataPoint(name, coordinates, row[row.size - 1].toDouble())
+                mClusterManager.addItem(locationData)
+            } else if (row[0] == "\"Bonaire") {
+                val coordinates = LatLng(row[3].toDouble(), row[4].toDouble())
+                var name = "Netherlands (Bonaire, Sint Eustatius, and Saba"
+                val locationData = DataPoint(name, coordinates, row[row.size - 1].toDouble())
+                mClusterManager.addItem(locationData)
+            } else {
+                if (row.size > 1 && row[2] != "Lat" && row[2].toDouble() != 0.0) {
+                    val coordinates = LatLng(row[2].toDouble(), row[3].toDouble())
+                    var name = row[1]
+                    if (row[0].isNotBlank()) {
+                        name += " (" + row[0] + ")"
+                    }
+                    val locationData = DataPoint(name, coordinates, row[row.size - 1].toDouble())
+                    mClusterManager.addItem(locationData)
+                }
+            }
         }
+
+
+//        val globalData = resources.openRawResource(R.raw.corona_data)
+//        val readerGlobal = BufferedReader(InputStreamReader(globalData, Charset.forName("UTF-8")))
+//
+//        readerGlobal.forEachLine {
+//
+//            val row = it.split(",")
+//
+//            if (row.size > 1 && row[2] != "Lat" && row[1] != "US") {
+//
+//                val coordinates = LatLng(row[2].toDouble(), row[3].toDouble())
+//                var name = row[1]
+//                if (row[0] != "") {
+//                    name += " (" + row[0] + ")"
+//                }
+//                val locationData = DataPoint(name, coordinates, row[95].toDouble())
+//                mClusterManager.addItem(locationData)
+//
+//            }
+//
+//        }
 
         var mProvider = HeatmapTileProvider.Builder().weightedData(listOfDataPoints).build()
         mProvider.setMaxIntensity(10000.00)
         mProvider.setRadius(50)
         val mOverlay = mMap.addTileOverlay(TileOverlayOptions().tileProvider(mProvider))
+
 
     }
 

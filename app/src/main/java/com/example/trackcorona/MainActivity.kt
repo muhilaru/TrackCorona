@@ -13,6 +13,15 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import com.example.trackcorona.ui.main.SectionsPagerAdapter
+import java.io.File
+import java.io.FileOutputStream
+import java.net.URL
+import android.os.StrictMode
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,7 +32,11 @@ class MainActivity : AppCompatActivity() {
 
         val loadMap = Intent(this, VirusMap::class.java)
 
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
+
         startActivity(loadMap)
+
 
 //        var mainButton = findViewById<Button>(R.id.mmbutton)
 //        mainButton.visibility = View.VISIBLE
@@ -45,8 +58,11 @@ class MainActivity : AppCompatActivity() {
 //        }
     }
 
-     fun loadHeatMap() {
+    fun loadHeatMap() {
 //         var mProvider = new HeatmapTileProvider.Builder();
 
     }
+
+
+
 }
