@@ -24,6 +24,7 @@ import kotlin.text.Charsets.UTF_8
 class VirusMap : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
+    private var most_cases_us: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,15 +57,19 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
         mMap.setOnMarkerClickListener(mClusterManager)
 
 
-        val coronaData = resources.openRawResource(R.raw.data_us)
-        val reader = BufferedReader(InputStreamReader(coronaData, Charset.forName("UTF-8")))
+        val url_us =
+            "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv"
+        var read_us = URL(url_us).openStream().bufferedReader(UTF_8)
 
-        reader.forEachLine {
-
-            val row = it.split(",")
+        var line: String? = ""
+        while (line != null) {
+            line = read_us.readLine()
+            if (line == null) {
+                break
+            }
+            val row = line.split(",")
 
             if (row.size > 1 && row[0] != "UID" && row[9] != "" && row[8].toDouble() != 0.0) {
-
                 val coordinates = LatLng(row[8].toDouble(), row[9].toDouble())
                 var name = row[6]
 
@@ -76,14 +81,15 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
 
                 mClusterManager.addItem(locationData)
                 listOfDataPoints.add(locationData.makeWeighted())
-
             }
         }
+
+
         val url =
             "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
         var iterate = URL(url).openStream().bufferedReader(UTF_8)
 
-        var line: String? = ""
+        line = ""
         while (line != null) {
             line = iterate.readLine()
             if (line == null) {
@@ -116,29 +122,8 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
         }
 
 
-//        val globalData = resources.openRawResource(R.raw.corona_data)
-//        val readerGlobal = BufferedReader(InputStreamReader(globalData, Charset.forName("UTF-8")))
-//
-//        readerGlobal.forEachLine {
-//
-//            val row = it.split(",")
-//
-//            if (row.size > 1 && row[2] != "Lat" && row[1] != "US") {
-//
-//                val coordinates = LatLng(row[2].toDouble(), row[3].toDouble())
-//                var name = row[1]
-//                if (row[0] != "") {
-//                    name += " (" + row[0] + ")"
-//                }
-//                val locationData = DataPoint(name, coordinates, row[95].toDouble())
-//                mClusterManager.addItem(locationData)
-//
-//            }
-//
-//        }
-
         var mProvider = HeatmapTileProvider.Builder().weightedData(listOfDataPoints).build()
-        mProvider.setMaxIntensity(10000.00)
+//        mProvider.setMaxIntensity(10000.00)
         mProvider.setRadius(50)
         val mOverlay = mMap.addTileOverlay(TileOverlayOptions().tileProvider(mProvider))
 
