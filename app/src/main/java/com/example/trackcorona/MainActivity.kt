@@ -35,104 +35,28 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.data_viz)
+        setContentView(R.layout.main_menu)
 
-
-
-        val loadMap = Intent(this, VirusMap::class.java)
-
+        //temporary solution to reading online dataset
+        //TODO: Implement Async task to avoid running network connection on main thread
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
-//        loadChart()
-//
-        startActivity(loadMap)
 
 
-//        var mainButton = findViewById<Button>(R.id.mmbutton)
-//        mainButton.visibility = View.VISIBLE
-//
-//        var mainTitle = findViewById<TextView>(R.id.maintitle)
-//        mainTitle.visibility = View.VISIBLE
 
 
-//        val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
-//        val viewPager: ViewPager = findViewById(R.id.view_pager)
-//        viewPager.adapter = sectionsPagerAdapter
-//        val tabs: TabLayout = findViewById(R.id.tabs)
-//        tabs.setupWithViewPager(viewPager)
-//        val fab: FloatingActionButton = findViewById(R.id.fab)
-//
-//        fab.setOnClickListener { view ->
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                .setAction("Action", null).show()
-//        }
+        val mainButton = findViewById<Button>(R.id.mmbutton)
+        mainButton.visibility = View.VISIBLE
+
+        val mainTitle = findViewById<TextView>(R.id.maintitle)
+        mainTitle.visibility = View.VISIBLE
+
+        mainButton.setOnClickListener {
+            val loadMap = Intent(this, VirusMap::class.java)
+            startActivity(loadMap)
+        }
     }
 
-    fun loadChart() {
-
-        var url =
-            "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
-        var reader = URL(url).openStream().bufferedReader(Charsets.UTF_8)
-
-        var line = ""
-        while (line != null) {
-            line = reader.readLine()
-            if (line == null) {
-                break
-            }
-            val row = line.split(",")
-
-            if (row[1] == "\"Korea") {
-                piechart_map.put(row[row.size - 1].toInt(), "South Korea")
-            } else if (row[0] == "\"Bonaire") {
-                piechart_map.put(
-                    row[row.size - 1].toInt(),
-                    "Netherlands (Bonaire, Sint Eustatius, and Saba"
-                )
-            } else {
-                if (row.size > 1 && row[2] != "Lat" && row[2].toDouble() != 0.0) {
-                    val coordinates = LatLng(row[2].toDouble(), row[3].toDouble())
-                    var name = row[1]
-                    if (row[0].isNotBlank()) {
-                        name += " (" + row[0] + ")"
-                    }
-                    piechart_map.put(row[row.size - 1].toInt(), name)
-
-                }
-            }
-        }
-
-        val sorted = piechart_map.toSortedMap(reverseOrder())
-        var counter = 0
-
-        var pieEntries = ArrayList<PieEntry>()
-
-        for ((key, value) in sorted) {
-            //println(value + " " + key)
-
-            if (counter == 10) {
-                break
-            } else {
-                pieEntries.add(PieEntry(key.toFloat(), value))
-            }
-
-            counter++;
-        }
-
-        var setData = PieDataSet(pieEntries, "Top 10 Countries")
-        var data = PieData(setData)
-
-
-
-        var chart = findViewById<PieChart>(R.id.piechart)
-//        chart.data = data
-//        chart.invalidate()
-
-
-
-
-
-    }
 
 
 }

@@ -22,6 +22,7 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.provider.CalendarContract
 import android.view.View.inflate
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
@@ -29,6 +30,7 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import kotlin.text.Charsets.UTF_8
 import com.example.trackcorona.MainActivity
+import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.utils.ColorTemplate
 
 
@@ -153,8 +155,11 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
         mProvider.setRadius(50)
         val mOverlay = mMap.addTileOverlay(TileOverlayOptions().tileProvider(mProvider))
 
-        setUpChart()
 
+        val graphButton = findViewById<Button>(R.id.graphview)
+        graphButton.setOnClickListener{
+            setUpChart()
+        }
 
     }
 
@@ -177,17 +182,25 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
             counter++;
         }
 
-        var setData = PieDataSet(pieEntries, "Top 10 Countries")
+        var setData = PieDataSet(pieEntries, "KEY")
         var colors = ColorTemplate.COLORFUL_COLORS
         setData.setColors(colors.toMutableList())
         var data = PieData(setData)
+        data.setValueTextSize(12.5.toFloat())
 
 
         setContentView(R.layout.data_viz)
         var chart = findViewById<PieChart>(R.id.piechart)
         chart.data = data
         chart.animateY(1000)
-        chart.setEntryLabelTextSize(50.toFloat())
+        chart.setEntryLabelTextSize(15.toFloat())
+        chart.setEntryLabelColor(Color.BLACK)
+        chart.setCenterTextSizePixels(30.toFloat())
+        chart.transparentCircleRadius = 60f
+        var description = Description()
+        description.text = "Top 10 countries with highest COVID-19 confirmed case count"
+        description.textSize = 12.5.toFloat()
+        chart.description = description
         chart.invalidate()
 
 
