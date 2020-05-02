@@ -1,8 +1,10 @@
 package com.example.trackcorona
 
 import android.graphics.Color
+import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -29,6 +31,7 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     // Hash map to pair countries with confirmed case count
     private var pieChartMap = HashMap<Int, String>()
+    private var pieChartAmerica = HashMap<Int, String>()
     private var mostCasesUSA: Double = 0.0
 
     // gaussian sphere radius of data points on heat map
@@ -71,6 +74,9 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
     // this callback is triggered when the map is ready to be used
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+
+        // button on google map to view graphs
+
 
         // list of weighted lat lng coordinates used to create heat map
         var listOfDataPoints = mutableListOf<WeightedLatLng>()
@@ -125,6 +131,7 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
                 // adding marker for each county
                 mClusterManager.addItem(locationData)
                 listOfDataPoints.add(locationData.makeWeighted())
+                pieChartAmerica.put(numOfCases.toInt(), row[COUNTY])
             }
         }
 
@@ -191,18 +198,16 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
         mProvider.setRadius(RADIUS)
         val mOverlay = mMap.addTileOverlay(TileOverlayOptions().tileProvider(mProvider))
 
-
-        // button on google map to view graphs
         val graphButton = findViewById<Button>(R.id.graphview)
         graphButton.setOnClickListener {
-            setUpChart()
+            setUpGlobalChart()
         }
 
     }
 
 
     // helper function to set up charts using confirmed case data
-    fun setUpChart() {
+    fun setUpGlobalChart() {
 
         //sorting map by decreasing order of confirmed cases
         val sorted = pieChartMap.toSortedMap(reverseOrder())
@@ -227,16 +232,17 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
         var colors = ColorTemplate.COLORFUL_COLORS
         setData.setColors(colors.toMutableList())
         var data = PieData(setData)
-        data.setValueTextSize(12.5.toFloat())
 
 
-        setContentView(R.layout.data_viz)
 
-        // setting data
+        setContentView(R.layout.global_chart)
+
+        // setting data of chart
         var chart = findViewById<PieChart>(R.id.piechart)
         chart.data = data
 
         // setting animation, colors, and text sizes
+        data.setValueTextSize(14.toFloat())
         chart.animateY(1000)
         chart.setEntryLabelTextSize(15.toFloat())
         chart.setEntryLabelColor(Color.BLACK)
@@ -249,6 +255,58 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
         chart.invalidate()
 
 
+        val graphAmerica = findViewById<Button>(R.id.americaView)
+        graphAmerica.setOnClickListener{
+            setUpUSChart()
+        }
+
+
+    }
+
+
+    // setting up charts to represent US data
+    fun setUpUSChart() {
+        val sortedAmerica = pieChartAmerica.toSortedMap(reverseOrder())
+        var counter = 0
+
+        // data for pie chart
+        var pieEntriesAmerica = ArrayList<PieEntry>()
+
+        // recording top 10 counties within the United States
+        for ((key, value) in sortedAmerica) {
+            if (counter == 10) {
+                break
+            } else {
+                pieEntriesAmerica.add(PieEntry(key.toFloat(), value))
+            }
+            counter++;
+        }
+
+
+        var setDataAmerica = PieDataSet(pieEntriesAmerica, "KEY")
+        setDataAmerica.setColors(ColorTemplate.COLORFUL_COLORS.toMutableList())
+        var dataAmerica = PieData(setDataAmerica)
+
+
+
+        setContentView(R.layout.us_chart)
+
+        // setting data of chart
+        var chartAmerica = findViewById<PieChart>(R.id.americaChart)
+        chartAmerica.data = dataAmerica
+
+        // setting animation, text size, colors, and other aesthetic features of chart
+        dataAmerica.setValueTextSize(14.toFloat())
+        chartAmerica.animateY(1000)
+        chartAmerica.setEntryLabelTextSize(15.toFloat())
+        chartAmerica.setEntryLabelColor(Color.BLACK)
+        chartAmerica.setCenterTextSizePixels(30.toFloat())
+        chartAmerica.transparentCircleRadius = 60f
+        var descriptionAmerica = Description()
+        descriptionAmerica.text = "Top 10 American Counties with Highest Confirmed Case Coun"
+        descriptionAmerica.textSize = 12.5.toFloat()
+        chartAmerica.description = descriptionAmerica
+        chartAmerica.invalidate()
     }
 
 
