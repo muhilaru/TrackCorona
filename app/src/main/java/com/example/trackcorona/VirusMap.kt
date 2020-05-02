@@ -327,6 +327,4 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-
-
 }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:id="@+id/globalTitle"
+        android:layout_width="343dp"
+        android:layout_height="77dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="50dp"
+        android:fontFamily="sans-serif-condensed-medium"
+        android:text="Top 10 Countries with Highest Confirmed Case Count"
+        android:textSize="25dp" />
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pieChart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+    </com.github.mikephil.charting.charts.PieChart>
+
+    <Button
+        android:id="@+id/americaView"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="#359c5e"
+        android:padding="8dp"
+        android:text="USA County Chart"
+        android:textColor="#ffffff" />
+
+
+
+</RelativeLayout>
