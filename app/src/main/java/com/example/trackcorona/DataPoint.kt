@@ -4,6 +4,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.heatmaps.WeightedLatLng
 
+// class used to manage data from COVID-19 data sets
 class DataPoint(var name: String, var location: LatLng, var density: Double): ClusterItem  {
 
 
@@ -19,6 +20,7 @@ class DataPoint(var name: String, var location: LatLng, var density: Double): Cl
         return name
     }
 
+    // used to label markers on google map
     override fun getSnippet(): String {
         return "Confirmed Cases: " + density.toInt()
     }

@@ -31,6 +31,12 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
     private var pieChartMap = HashMap<Int, String>()
     private var mostCasesUSA: Double = 0.0
 
+    // gaussian sphere radius of data points on heat map
+    private val RADIUS = 50
+
+    // intensity multiplier of heat map for best visualization of US data
+    private val INTENSITY = 1/2.0
+
     // using COVID-19 data from Johns Hopkins University
     //https://github.com/CSSEGISandData/COVID-19
     private val usaData =
@@ -38,16 +44,18 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
     private val globalData =
         "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
 
+    //indices of parsed csv file for needed information (global data)
     private val PROVINCE = 0
     private val COUNTRY = 1
-    private val LAT = 2
-    private val LNG = 3
+    private val GBL_LAT = 2
+    private val GBL_LNG = 3
 
-
-    private val US_LAT = 8
-    private val US_LNG = 9
+    //indices for US data
     private val COUNTY = 5
     private val STATE = 6
+    private val US_LAT = 8
+    private val US_LNG = 9
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,11 +99,10 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
             val row = line.split(",")
 
 
-            //skipping first row of column labels
-            //skipping cruise ships (labeled with lat lng of (0.0, 0.0)
-            //ensuring latitue and longitude are provided
+            // skipping first row of column labels
+            // skipping cruise ships (labeled with lat lng of (0.0, 0.0)
+            // ensuring latitue and longitude are provided
             if (row[0] != "UID" && row[US_LNG] != "" && row[US_LAT].toDouble() != 0.0) {
-
 
                 val coordinates = LatLng(row[US_LAT].toDouble(), row[US_LNG].toDouble())
                 var name = row[STATE]
@@ -106,13 +113,16 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
 
                 val numOfCases = row[row.size - 1].toDouble()
 
+                // keeping track of which counties have the highest confirmed case count
                 if (mostCasesUSA < numOfCases) {
                     mostCasesUSA = numOfCases
                 }
 
 
+                // creating weighted data point for heat map
                 val locationData = DataPoint(name, coordinates, numOfCases)
 
+                // adding marker for each county
                 mClusterManager.addItem(locationData)
                 listOfDataPoints.add(locationData.makeWeighted())
             }
@@ -120,9 +130,10 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
 
 
 
+        // now iterating through global confirmed case data
         reader = URL(globalData).openStream().bufferedReader(UTF_8)
-
         line = ""
+
         while (line != null) {
             line = reader.readLine()
             if (line == null) {
@@ -131,6 +142,8 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
 
             val row = line.split(",")
 
+            // accounting for errors in data set (South Korea and Netherlands)
+            // (extra commas in country name pushes back all indices)
             if (row[COUNTRY] == "\"Korea") {
                 val coordinates = LatLng(row[3].toDouble(), row[4].toDouble())
                 val name = "South Korea"
@@ -149,16 +162,22 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
 
 
             } else {
-                if (row.size > 1 && row[LAT] != "Lat" && row[LAT].toDouble() != 0.0) {
 
+                // making sure row contains data and is populated
+                if (row.size > 1 && row[GBL_LAT] != "Lat" && row[GBL_LAT].toDouble() != 0.0) {
 
-                    val coordinates = LatLng(row[LAT].toDouble(), row[LNG].toDouble())
+                    // recording data
+                    val coordinates = LatLng(row[GBL_LAT].toDouble(), row[GBL_LNG].toDouble())
                     var name = row[COUNTRY]
                     if (row[PROVINCE].isNotBlank()) {
                         name += " (" + row[PROVINCE] + ")"
                     }
+
+                    // adding marker for each country
                     val locationData = DataPoint(name, coordinates, row[row.size - 1].toDouble())
                     mClusterManager.addItem(locationData)
+
+                    // tracking countries and their total confirmed case count
                     pieChartMap.put(row[row.size - 1].toInt(), name)
 
                 }
@@ -166,12 +185,14 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
         }
 
 
+        //making heat map
         val mProvider = HeatmapTileProvider.Builder().weightedData(listOfDataPoints).build()
-        mProvider.setMaxIntensity(mostCasesUSA / 2.0)
-        mProvider.setRadius(50)
+        mProvider.setMaxIntensity(mostCasesUSA * INTENSITY)
+        mProvider.setRadius(RADIUS)
         val mOverlay = mMap.addTileOverlay(TileOverlayOptions().tileProvider(mProvider))
 
 
+        // button on google map to view graphs
         val graphButton = findViewById<Button>(R.id.graphview)
         graphButton.setOnClickListener {
             setUpChart()
@@ -179,24 +200,29 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+
+    // helper function to set up charts using confirmed case data
     fun setUpChart() {
 
+        //sorting map by decreasing order of confirmed cases
         val sorted = pieChartMap.toSortedMap(reverseOrder())
         var counter = 0
 
+        // data for pie chart
         var pieEntries = ArrayList<PieEntry>()
 
+        // recording top 10 countries
         for ((key, value) in sorted) {
-
             if (counter == 10) {
                 break
             } else {
                 pieEntries.add(PieEntry(key.toFloat(), value))
             }
-
             counter++;
         }
 
+
+        // creating chart and setting attributes
         var setData = PieDataSet(pieEntries, "KEY")
         var colors = ColorTemplate.COLORFUL_COLORS
         setData.setColors(colors.toMutableList())
@@ -205,8 +231,12 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
 
 
         setContentView(R.layout.data_viz)
+
+        // setting data
         var chart = findViewById<PieChart>(R.id.piechart)
         chart.data = data
+
+        // setting animation, colors, and text sizes
         chart.animateY(1000)
         chart.setEntryLabelTextSize(15.toFloat())
         chart.setEntryLabelColor(Color.BLACK)
