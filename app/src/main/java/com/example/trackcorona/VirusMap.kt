@@ -1,5 +1,6 @@
 package com.example.trackcorona
 
+import android.content.Intent
 import android.graphics.Color
 import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
@@ -31,14 +32,16 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     // Hash map to pair countries with confirmed case count
     private var pieChartMap = HashMap<Int, String>()
+    // Hash map to pair US counties with confirmed case count
     private var pieChartAmerica = HashMap<Int, String>()
+
     private var mostCasesUSA: Double = 0.0
 
     // gaussian sphere radius of data points on heat map
     private val RADIUS = 50
 
     // intensity multiplier of heat map for best visualization of US data
-    private val INTENSITY = 1/2.0
+    private val INTENSITY = 1 / 2.0
 
     // using COVID-19 data from Johns Hopkins University
     //https://github.com/CSSEGISandData/COVID-19
@@ -134,7 +137,6 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
                 pieChartAmerica.put(numOfCases.toInt(), row[COUNTY])
             }
         }
-
 
 
         // now iterating through global confirmed case data
@@ -255,8 +257,9 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
         chart.invalidate()
 
 
+        // displaying pie chart of American counties
         val graphAmerica = findViewById<Button>(R.id.americaView)
-        graphAmerica.setOnClickListener{
+        graphAmerica.setOnClickListener {
             setUpUSChart()
         }
 
@@ -266,6 +269,8 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
 
     // setting up charts to represent US data
     fun setUpUSChart() {
+
+        // using data from American counties
         val sortedAmerica = pieChartAmerica.toSortedMap(reverseOrder())
         var counter = 0
 
@@ -307,7 +312,18 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
         descriptionAmerica.textSize = 12.5.toFloat()
         chartAmerica.description = descriptionAmerica
         chartAmerica.invalidate()
+
+
+        // button to return user to the main menu
+        val returnMain = findViewById<Button>(R.id.returnMain)
+        returnMain.setOnClickListener {
+            val loadMap = Intent(this, MainActivity::class.java)
+            startActivity(loadMap)
+        }
+
     }
+
+
 
 
 }
