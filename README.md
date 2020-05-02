@@ -8,7 +8,6 @@ TrackCorona is an Android application written in Kotlin that allows users to vie
 
 # Images
 
-![](images/main_menu.PNG)
 ![](images/us_map.PNG)
 ![](images/map_marker.PNG)
 ![](images/global_chart.PNG)
