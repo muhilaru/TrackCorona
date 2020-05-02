@@ -240,7 +240,7 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.global_chart)
 
         // setting data of chart
-        var chart = findViewById<PieChart>(R.id.piechart)
+        var chart = findViewById<PieChart>(R.id.pieChart)
         chart.data = data
 
         // setting animation, colors, and text sizes
@@ -250,10 +250,12 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
         chart.setEntryLabelColor(Color.BLACK)
         chart.setCenterTextSizePixels(30.toFloat())
         chart.transparentCircleRadius = 60f
+
+        // setting description blank and using TextView to label instead
         var description = Description()
-        description.text = "Top 10 countries with highest COVID-19 confirmed case count"
-        description.textSize = 12.5.toFloat()
+        description.text = ""
         chart.description = description
+
         chart.invalidate()
 
 
@@ -307,9 +309,10 @@ class VirusMap : AppCompatActivity(), OnMapReadyCallback {
         chartAmerica.setEntryLabelColor(Color.BLACK)
         chartAmerica.setCenterTextSizePixels(30.toFloat())
         chartAmerica.transparentCircleRadius = 60f
+
+        // setting description blank and using TextView to label graph instead
         var descriptionAmerica = Description()
-        descriptionAmerica.text = "Top 10 American Counties with Highest Confirmed Case Coun"
-        descriptionAmerica.textSize = 12.5.toFloat()
+        descriptionAmerica.text = ""
         chartAmerica.description = descriptionAmerica
         chartAmerica.invalidate()
 

@@ -27,32 +27,49 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <TextView
+            android:id="@+id/credit"
+            android:layout_width="378dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="-10dp"
+            android:layout_marginBottom="7dp"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:text="All statistics and data derived from Johns Hopkins University,
+            Center for Systems Science and Engineering COVID-19 data set"
+            android:textColor="#FF893B" />
+
         <Button
             android:id="@+id/mmbutton"
+            style="@style/Widget.AppCompat.Button"
             android:layout_width="125dp"
             android:layout_height="83dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="149dp"
-            android:layout_marginTop="352dp"
-            android:layout_marginEnd="136dp"
-            android:layout_marginBottom="296dp"
+            android:layout_marginStart="144dp"
+            android:layout_marginTop="316dp"
+            android:layout_marginEnd="141dp"
+            android:layout_marginBottom="332dp"
             android:fontFamily="sans-serif-condensed-medium"
+            android:outlineAmbientShadowColor="#00E70E0E"
+            android:outlineSpotShadowColor="#00E70B0B"
+            android:shadowColor="#00252523"
             android:text="Start Tracking"
             android:textColor="#F10909" />
 
         <TextView
             android:id="@+id/maintitle"
-            android:layout_width="194dp"
+            android:layout_width="191dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="113dp"
-            android:layout_marginEnd="87dp"
-            android:layout_marginBottom="577dp"
+            android:layout_marginStart="131dp"
+            android:layout_marginEnd="89dp"
+            android:layout_marginBottom="593dp"
             android:fontFamily="sans-serif-condensed-medium"
             android:text="TrackCorona"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
